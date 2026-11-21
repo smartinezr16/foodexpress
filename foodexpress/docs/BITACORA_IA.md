@@ -6,126 +6,168 @@
 
 ## 1. Introducción
 
-Durante la construcción de FoodExpress utilizamos inteligencia artificial como una herramienta de apoyo para orientar el desarrollo del proyecto, resolver dudas técnicas y evaluar diferentes alternativas de implementación.
+Durante el desarrollo de FoodExpress utilizamos inteligencia artificial como una herramienta complementaria de consulta, aprendizaje y orientación técnica.
 
-Nuestro propósito al utilizarla fue contar con una fuente adicional de orientación que nos permitiera comprender mejor algunos conceptos de arquitectura de software y encontrar soluciones a las dificultades que surgieron durante el proceso.
+El proyecto se desarrolló a partir de los requerimientos de la asignatura y de las decisiones tomadas por nuestro equipo. A lo largo del proceso investigamos diferentes tecnologías, analizamos alternativas de arquitectura y trabajamos en la construcción e integración de los componentes necesarios para el funcionamiento del sistema.
 
-La herramienta también participó en la generación de componentes de código, pruebas y documentación. Como equipo definimos el proyecto, las tecnologías y el alcance, y realizamos verificaciones de funcionamiento.
+La inteligencia artificial fue uno de los recursos utilizados para resolver inquietudes, comprender conceptos técnicos y consultar posibles soluciones ante las dificultades encontradas.
+
+Su utilización no reemplazó la necesidad de comprender el funcionamiento del software, evaluar las alternativas disponibles y comprobar los resultados mediante pruebas.
 
 ## 2. Herramienta utilizada
 
-La herramienta utilizada fue Claude, desarrollada por Anthropic.
+La herramienta de inteligencia artificial utilizada fue **Claude, desarrollada por Anthropic**.
 
-La empleamos para consultar conceptos técnicos, comparar alternativas de diseño, estructurar componentes, generar implementaciones y apoyar la revisión de errores.
+Recurrimos a ella principalmente como recurso de apoyo para consultar conceptos relacionados con arquitectura de software, patrones de diseño, microservicios y tecnologías utilizadas en el proyecto.
 
-Su utilización estuvo relacionada principalmente con la arquitectura de microservicios, los patrones de diseño, la comunicación entre servicios, las pruebas y la documentación técnica.
+También la empleamos para revisar ejemplos de implementación, analizar mensajes de error, consultar buenas prácticas y recibir sugerencias técnicas.
+
+Las respuestas obtenidas se utilizaron como referencias durante el desarrollo, teniendo en cuenta que debían ser comprendidas, evaluadas y contrastadas con los requerimientos y el comportamiento real de FoodExpress.
 
 ## 3. Aplicación de la inteligencia artificial durante el proyecto
 
 ### Selección y planificación
 
-En la etapa inicial utilizamos la IA para comparar las alternativas disponibles y comprender los principales retos técnicos de cada una.
+Durante la planificación analizamos las alternativas disponibles para desarrollar el proyecto y los requerimientos establecidos en la asignatura.
 
-A partir de este análisis, el equipo seleccionó FoodExpress y definió el alcance de la solución.
+El equipo seleccionó FoodExpress y definió las funcionalidades principales que debía ofrecer la aplicación.
 
-También utilizamos la herramienta para evaluar tecnologías y organizar la estructura general del sistema.
+En esta etapa utilizamos Claude para aclarar dudas sobre las tecnologías que estábamos considerando, comprender sus características y consultar recomendaciones relacionadas con la organización del sistema.
+
+Esta información sirvió como complemento para evaluar las opciones y orientar nuestras decisiones.
 
 ### Arquitectura del software
 
-La IA nos permitió explorar diferentes alternativas para organizar los componentes y comprender cómo aplicar Clean Architecture en una solución basada en microservicios.
+Uno de los aspectos más importantes del proyecto fue comprender cómo organizar una aplicación basada en microservicios y cómo aplicar los principios de Clean Architecture.
 
-Se trabajó con tres servicios principales:
+Para ello estudiamos la separación de responsabilidades, las dependencias entre componentes y la comunicación entre servicios.
+
+La solución se organizó alrededor de tres servicios principales:
 
 - Restaurantes y Menú.
 - Pedidos.
 - Notificaciones.
 
-También se abordó la aplicación de los patrones Builder, State y Adapter, relacionándolos con las necesidades del sistema.
+También trabajamos con los patrones de diseño Builder, State y Adapter, relacionando sus características con las necesidades del sistema.
 
-La herramienta contribuyó tanto a la explicación de estas soluciones como a la generación de parte de su implementación.
+Durante este proceso utilizamos Claude para consultar explicaciones, revisar ejemplos de código y resolver inquietudes sobre la aplicación de estos conceptos.
+
+El objetivo de estas consultas fue fortalecer nuestra comprensión de las decisiones arquitectónicas y contar con referencias técnicas que pudiéramos evaluar durante el desarrollo.
 
 ### Desarrollo del backend
 
-Durante la construcción del backend utilizamos Claude para apoyar la implementación con Java y Spring Boot.
+Para el backend trabajamos con Java y Spring Boot, organizando los componentes de acuerdo con las responsabilidades definidas para cada servicio.
 
-La herramienta ayudó a estructurar los componentes, desarrollar funcionalidades, proponer validaciones y generar pruebas automatizadas.
+Durante esta etapa abordamos aspectos relacionados con controladores, servicios, validaciones, persistencia de información y comunicación entre componentes.
 
-También permitió explorar mecanismos de comunicación mediante RabbitMQ y persistencia con PostgreSQL.
+Claude fue utilizado como apoyo para consultar documentación, comprender determinadas configuraciones, revisar ejemplos de implementación y analizar posibles causas de errores.
 
-El equipo realizó una ejecución local de la versión inicial utilizando Docker Compose, lo que permitió comprobar el funcionamiento del sistema fuera del entorno de la IA.
+También consultamos recomendaciones sobre pruebas automatizadas, RabbitMQ y PostgreSQL.
+
+Una parte importante del proceso consistió en ejecutar los servicios mediante Docker Compose en nuestro entorno local, revisar su comportamiento y comprobar la integración de los diferentes componentes.
+
+Estas verificaciones fueron necesarias para identificar problemas que no podían resolverse únicamente mediante consultas a la herramienta.
 
 ### Desarrollo del frontend
 
-Para la interfaz web trabajamos con React, TypeScript y Vite.
+La interfaz web de FoodExpress se trabajó utilizando React, TypeScript y Vite.
 
-La IA apoyó la construcción de componentes y la identificación de problemas relacionados con la navegación, la presentación de información y las notificaciones.
+Durante esta etapa abordamos la organización de componentes visuales, la navegación entre pantallas y la presentación de información al usuario.
 
-Se desarrollaron funcionalidades como la consulta de restaurantes, visualización de menús, carrito de compras, seguimiento de pedidos y panel de cocina.
+Entre las funcionalidades contempladas estuvieron la consulta de restaurantes, visualización de menús, carrito de compras, seguimiento de pedidos y panel de cocina.
 
-Las pruebas realizadas con un backend simulado permitieron detectar problemas de visualización y comportamiento que fueron corregidos durante el desarrollo.
+Utilizamos Claude para aclarar dudas relacionadas con React y TypeScript, consultar alternativas de organización de componentes y analizar errores que aparecieron durante las pruebas.
+
+También realizamos verificaciones utilizando un backend simulado, lo que permitió revisar el comportamiento de la interfaz e identificar aspectos que necesitaban ajustes.
+
+Este proceso nos permitió comprender mejor la relación entre la interfaz de usuario y los servicios que proporcionan la información.
 
 ### Integración de tecnologías
 
-Uno de los retos fue comprender cómo se relacionaban los diferentes servicios y cómo podían ejecutarse mediante Docker.
+La integración de las diferentes tecnologías representó uno de los principales desafíos técnicos del proyecto.
 
-Utilizamos la IA para orientar la configuración de contenedores, redes, variables de entorno y comunicación entre componentes.
+Fue necesario comprender la relación entre los servicios, la configuración de contenedores y los mecanismos utilizados para permitir la comunicación entre los componentes.
 
-También sirvió para analizar errores de configuración, especialmente en Nginx, y proponer soluciones que posteriormente pudieran verificarse.
+Durante esta etapa recurrimos a Claude para consultar conceptos relacionados con Docker, redes, variables de entorno y configuración de Nginx.
+
+Las recomendaciones obtenidas nos sirvieron como referencia para investigar los problemas encontrados y evaluar posibles soluciones.
+
+Las pruebas en el entorno local fueron fundamentales para comprobar qué configuraciones funcionaban correctamente y cuáles requerían modificaciones.
 
 ### Documentación y diagramas
 
-La herramienta apoyó la elaboración de diagramas UML y C4, así como la organización de requerimientos funcionales, reglas de negocio y decisiones arquitectónicas.
+La documentación fue utilizada para organizar y representar los aspectos técnicos del proyecto.
 
-Estos recursos facilitaron representar la estructura del sistema y relacionar las decisiones técnicas con los conceptos estudiados en la asignatura.
+Trabajamos con conceptos relacionados con diagramas UML y C4, requerimientos funcionales, reglas de negocio y decisiones arquitectónicas.
+
+Claude sirvió como recurso de consulta para aclarar la finalidad de los diferentes diagramas, revisar convenciones y recibir sugerencias sobre la organización de la información.
+
+La documentación permitió relacionar los componentes de FoodExpress con los conceptos estudiados durante la asignatura y facilitar la comprensión general de la solución.
 
 ## 4. Participación del equipo
 
-La participación del equipo comenzó con la elección del proyecto y la definición de las tecnologías y funcionalidades que se desarrollarían.
+El equipo tuvo a su cargo la definición del proyecto, la selección de tecnologías, la organización de las funcionalidades y el seguimiento del proceso de desarrollo.
 
-También establecimos las prioridades de implementación y utilizamos los requerimientos académicos como referencia para orientar el trabajo.
+Durante la construcción de FoodExpress trabajamos en comprender la arquitectura propuesta, revisar la relación entre los componentes y comprobar el funcionamiento de las diferentes tecnologías.
 
-Durante el proceso combinamos las decisiones del equipo con las propuestas y los componentes generados mediante inteligencia artificial.
+Las consultas realizadas a Claude formaron parte de nuestro proceso de investigación y resolución de dificultades técnicas.
 
-La ejecución local del sistema fue una actividad importante, ya que permitió comprobar aspectos que la herramienta no podía verificar completamente en su propio entorno.
+Las sugerencias de la herramienta no se consideraron automáticamente como soluciones definitivas. Fue necesario revisar su pertinencia, contrastarlas con los requerimientos y comprobar su funcionamiento.
 
-Para completar el registro de participación individual, se deben incorporar las actividades específicas realizadas por cada integrante durante las revisiones, pruebas, correcciones y preparación de la entrega.
+La ejecución local del sistema, las pruebas de integración y la revisión de errores permitieron identificar situaciones que requerían análisis y ajustes adicionales.
+
+De esta manera, el uso de inteligencia artificial se integró como un recurso complementario dentro de las actividades de desarrollo del equipo.
 
 ## 5. Dificultades y soluciones
 
-Durante el desarrollo encontramos dificultades relacionadas con la integración de tecnologías, la configuración del entorno y la comunicación entre componentes.
+Durante el desarrollo encontramos dificultades relacionadas principalmente con la configuración del entorno, la integración de tecnologías y la comunicación entre componentes.
 
-Una de las principales limitaciones fue que la IA no podía ejecutar completamente todos los servicios en su entorno. Por ello, fue necesario utilizar Docker Compose en un equipo local.
+Uno de los retos fue conseguir que los diferentes servicios funcionaran conjuntamente mediante Docker Compose.
 
-También se identificaron problemas en la configuración de Nginx, notificaciones duplicadas y dificultades de visualización en dispositivos móviles.
+Para abordar estas dificultades consultamos documentación técnica, revisamos mensajes de error y utilizamos Claude como una fuente adicional de orientación.
 
-La herramienta permitió analizar estos problemas y generar correcciones, lo que facilitó continuar con el desarrollo.
+También identificamos situaciones relacionadas con la configuración de Nginx, notificaciones duplicadas y problemas de visualización en dispositivos móviles.
 
-Otra dificultad fue la incorporación tardía del control de versiones. A partir de esta experiencia se planteó una estrategia GitFlow para organizar las siguientes modificaciones del proyecto.
+Las recomendaciones consultadas permitieron considerar diferentes alternativas, pero fue necesario realizar verificaciones y ajustes en el entorno de desarrollo para evaluar los resultados.
+
+Otra dificultad fue la incorporación tardía del control de versiones. Esta experiencia nos permitió reconocer la importancia de organizar los cambios del proyecto desde sus primeras etapas y considerar una estrategia GitFlow para futuras modificaciones.
+
+Estas situaciones demostraron que el desarrollo de software requiere análisis, pruebas y seguimiento continuo, independientemente de las herramientas de apoyo utilizadas.
 
 ## 6. Aprendizajes
 
-El desarrollo de FoodExpress nos permitió acercarnos a conceptos de arquitectura de software mediante un proyecto que integraba diferentes tecnologías.
+El desarrollo de FoodExpress nos permitió profundizar en diferentes conceptos estudiados durante la asignatura.
 
-Entre los temas trabajados estuvieron la separación de responsabilidades, los patrones de diseño, la comunicación mediante eventos y la organización de una aplicación en microservicios.
+Entre los principales aprendizajes estuvieron la organización de aplicaciones mediante microservicios, la separación de responsabilidades, la aplicación de patrones de diseño y la comunicación entre componentes.
 
-También aprendimos que las respuestas de una herramienta de inteligencia artificial deben revisarse y contrastarse con el comportamiento real del sistema.
+También adquirimos mayor familiaridad con tecnologías como Java, Spring Boot, React, TypeScript, RabbitMQ, PostgreSQL y Docker.
 
-La experiencia mostró la importancia de complementar las herramientas de desarrollo con pruebas, documentación y comprensión de las decisiones técnicas.
+El uso de Claude nos permitió consultar explicaciones adicionales y explorar diferentes maneras de abordar problemas técnicos.
+
+Sin embargo, uno de los aprendizajes más importantes fue comprender que una respuesta generada por inteligencia artificial no garantiza que una solución sea correcta o apropiada para un proyecto.
+
+Por esta razón, reconocimos la importancia de revisar las recomendaciones, comprender el código utilizado y realizar pruebas que permitieran comprobar el comportamiento del sistema.
 
 ## 7. Reflexión final
 
-Consideramos que la inteligencia artificial fue un recurso útil durante el desarrollo de FoodExpress, ya que nos permitió consultar dudas, explorar soluciones y avanzar en la construcción del sistema.
+Consideramos que la inteligencia artificial fue una herramienta útil para complementar nuestro proceso de aprendizaje durante el desarrollo de FoodExpress.
 
-Su apoyo no se limitó a proporcionar información: también contribuyó a la generación de código, pruebas y documentación que formaron parte del proyecto.
+Su principal valor estuvo en facilitar el acceso a explicaciones técnicas, ejemplos de referencia y alternativas que nos ayudaron a comprender mejor algunos de los desafíos encontrados.
 
-Al mismo tiempo, la experiencia nos permitió reconocer la importancia de definir correctamente los requerimientos, evaluar las alternativas propuestas y verificar los resultados obtenidos.
+La experiencia también nos permitió reconocer que utilizar inteligencia artificial de manera responsable implica mantener una actitud crítica frente a sus respuestas.
 
-Como equipo, esta experiencia nos ayudó a comprender mejor el proceso de construcción de una aplicación basada en microservicios y la necesidad de utilizar las herramientas de inteligencia artificial con criterio técnico y responsabilidad.
+No todas las recomendaciones son aplicables a cualquier proyecto, por lo que resulta necesario analizar su contexto, revisar su pertinencia y comprobar los resultados.
+
+FoodExpress representó una oportunidad para poner en práctica conocimientos de arquitectura de software y fortalecer nuestras habilidades para investigar, analizar problemas y trabajar con diferentes tecnologías.
 
 ## 8. Conclusión
 
-FoodExpress fue una experiencia de aprendizaje en la que combinamos decisiones del equipo, tecnologías de desarrollo y herramientas de inteligencia artificial.
+El desarrollo de FoodExpress fue una experiencia académica en la que aplicamos conceptos de diseño y arquitectura de software mediante la construcción de una aplicación basada en microservicios.
 
-Claude aportó orientación técnica y colaboró en la elaboración de diferentes componentes del sistema. El equipo definió el alcance, seleccionó las tecnologías y realizó verificaciones locales.
+Como equipo participamos en la definición del proyecto, la selección de tecnologías, la organización de sus componentes y las actividades de integración y verificación del sistema.
 
-La principal enseñanza fue comprender que la inteligencia artificial puede facilitar distintas actividades del desarrollo de software, pero sus resultados requieren revisión, pruebas y decisiones fundamentadas para construir una solución funcional.
+Durante este proceso utilizamos Claude como una herramienta complementaria para resolver dudas, consultar ejemplos técnicos, comprender conceptos y evaluar posibles soluciones.
+
+La principal enseñanza fue reconocer que la inteligencia artificial puede contribuir al aprendizaje y facilitar determinadas actividades del desarrollo de software, pero su utilización debe acompañarse de comprensión técnica, análisis crítico y verificación de resultados.
+
+En nuestro caso, la herramienta formó parte de los recursos de apoyo utilizados durante el proyecto, mientras que la responsabilidad académica sobre las decisiones, la comprensión de la solución y la presentación de FoodExpress correspondió al equipo.
