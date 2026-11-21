@@ -1,0 +1,107 @@
+---
+title: Notificaciones · Patrón Adapter para los canales
+---
+classDiagram
+    direction TB
+    class CanalNotificacion {
+        <<interface · Target>>
+        +canal() Canal
+        +enviar(Mensaje)
+    }
+    class EmailCanalAdapter {
+        <<Adapter>>
+        -JavaMailSender mailSender
+        -String remitente
+    }
+    class WebSocketCanalAdapter {
+        <<Adapter>>
+        -SimpMessagingTemplate messagingTemplate
+    }
+    class PushCanalAdapter {
+        <<Adapter>>
+        -ProveedorPushSimulado proveedor
+    }
+    class JavaMailSender {
+        <<Adaptee · Spring Mail>>
+        +send(SimpleMailMessage)
+    }
+    class SimpMessagingTemplate {
+        <<Adaptee · Spring WebSocket>>
+        +convertAndSend(String, Object)
+    }
+    class ProveedorPushSimulado {
+        <<Adaptee · SDK externo>>
+        +publicarEnTema(String, Map) String
+    }
+    class DespachadorNotificaciones {
+        -Map~Canal, CanalNotificacion~ canales
+        +despachar(String, Mensaje, Set~Canal~)
+    }
+    class NotificarPedidoCreadoUseCase {
+        +ejecutar(EventoPedido)
+    }
+    class NotificarCambioEstadoUseCase {
+        +ejecutar(EventoPedido)
+    }
+    class NotificarPedidoCanceladoUseCase {
+        +ejecutar(EventoPedido)
+    }
+    class Mensaje {
+        <<record>>
+        Long pedidoId
+        Long restauranteId
+        Destinatario destinatario
+        String tipoEvento
+        String estadoPedido
+        String asunto
+        String cuerpo
+    }
+    class Destinatario {
+        <<record>>
+        TipoDestinatario tipo
+        String nombre
+        String email
+    }
+    class Notificacion {
+        <<record>>
+        Long id
+        String eventId
+        Long pedidoId
+        Canal canal
+        EstadoEnvio estado
+        Instant fecha
+    }
+    class Canal {
+        <<enumeration>>
+        EMAIL
+        WEBSOCKET
+        PUSH
+    }
+    class NotificacionRepository {
+        <<interface>>
+        +guardar(Notificacion) Notificacion
+        +buscarPorPedido(Long) List~Notificacion~
+    }
+    class EventoProcesadoRepository {
+        <<interface>>
+        +registrarSiEsNuevo(String) boolean
+    }
+
+    CanalNotificacion <|.. EmailCanalAdapter
+    CanalNotificacion <|.. WebSocketCanalAdapter
+    CanalNotificacion <|.. PushCanalAdapter
+    EmailCanalAdapter --> JavaMailSender : adapta
+    WebSocketCanalAdapter --> SimpMessagingTemplate : adapta
+    PushCanalAdapter --> ProveedorPushSimulado : adapta
+    DespachadorNotificaciones o-- "1..*" CanalNotificacion
+    DespachadorNotificaciones --> NotificacionRepository
+    NotificarPedidoCreadoUseCase --> DespachadorNotificaciones
+    NotificarCambioEstadoUseCase --> DespachadorNotificaciones
+    NotificarPedidoCanceladoUseCase --> DespachadorNotificaciones
+    NotificarPedidoCreadoUseCase --> EventoProcesadoRepository
+    NotificarCambioEstadoUseCase --> EventoProcesadoRepository
+    NotificarPedidoCanceladoUseCase --> EventoProcesadoRepository
+    Mensaje *-- Destinatario
+    DespachadorNotificaciones ..> Mensaje
+    DespachadorNotificaciones ..> Notificacion : registra
+    CanalNotificacion ..> Canal

@@ -1,0 +1,24 @@
+# Solo para desarrollo: publica los puertos de la infraestructura en el equipo para poder
+# ejecutar los microservicios desde el IDE (mvn spring-boot:run) contra estos contenedores.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up \
+#       postgres-restaurantes postgres-pedidos postgres-notificaciones rabbitmq mailpit
+#
+# Los puertos coinciden con los valores por defecto de cada application.yml.
+
+services:
+  postgres-restaurantes:
+    ports:
+      - "5433:5432"   # restaurantes_db
+  postgres-pedidos:
+    ports:
+      - "5434:5432"   # pedidos_db
+  postgres-notificaciones:
+    ports:
+      - "5435:5432"   # notificaciones_db
+  rabbitmq:
+    ports:
+      - "5672:5672"   # AMQP
+  mailpit:
+    ports:
+      - "1025:1025"   # SMTP

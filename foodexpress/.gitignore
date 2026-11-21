@@ -1,0 +1,23 @@
+target/
+*.class
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Frontend
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Variables de entorno reales (credenciales): nunca al repositorio
+.env

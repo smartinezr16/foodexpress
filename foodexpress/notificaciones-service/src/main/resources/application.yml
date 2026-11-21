@@ -1,0 +1,47 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: notificaciones-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/notificaciones_db}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        # Tras agotar los reintentos el mensaje no vuelve a la cola: va a la cola de muertos
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1s
+          multiplier: 2.0
+
+# Correo: el servidor SMTP se indica con las variables de entorno SPRING_MAIL_HOST y
+# SPRING_MAIL_PORT (docker-compose las apunta a Mailpit). Si no se definen, los correos
+# no se envían: se escriben en el log como "[EMAIL simulado]".
+
+foodexpress:
+  notificaciones:
+    remitente: ${MAIL_FROM:pedidos@foodexpress.local}
+
+# Health check que usa docker-compose: /actuator/health responde 200 (UP) solo si la base de datos
+# y RabbitMQ responden; si no, 503 (DOWN) y Compose no arranca los servicios que dependen de este.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

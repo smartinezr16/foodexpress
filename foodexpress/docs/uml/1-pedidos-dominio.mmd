@@ -1,0 +1,115 @@
+---
+title: Pedidos · Dominio (Builder, State y LSP)
+---
+classDiagram
+    direction TB
+    class Pedido {
+        <<abstract>>
+        -Long id
+        -Long version
+        -Cliente cliente
+        -Long restauranteId
+        -String restauranteNombre
+        -List~ItemPedido~ items
+        -BigDecimal tasaImpuesto
+        -Instant fechaCreacion
+        -EstadoPedido estado
+        -ActorCancelacion canceladoPor
+        -String motivoCancelacion
+        +builder()$ PedidoBuilder
+        +getTipo()* TipoPedido
+        +costoEnvio()* BigDecimal
+        +subtotal() BigDecimal
+        +impuestos() BigDecimal
+        +total() BigDecimal
+        +avanzar() EstadoPedidoTipo
+        +cancelar(ActorCancelacion, String) EstadoPedidoTipo
+        +estaFinalizado() boolean
+    }
+    class PedidoLocal {
+        +getTipo() TipoPedido
+        +costoEnvio() BigDecimal
+    }
+    class PedidoDelivery {
+        -String direccionEntrega
+        -BigDecimal costoEnvio
+        +getTipo() TipoPedido
+        +costoEnvio() BigDecimal
+    }
+    class PedidoBuilder {
+        +cliente(String, String) PedidoBuilder
+        +restaurante(Long, String) PedidoBuilder
+        +tasaImpuesto(BigDecimal) PedidoBuilder
+        +agregarItem(Consumer~ItemPedido.Builder~) PedidoBuilder
+        +paraRecoger() PedidoBuilder
+        +conDomicilio(String, BigDecimal) PedidoBuilder
+        +construir() Pedido
+    }
+    class ItemPedido {
+        -Long platoId
+        -String nombrePlato
+        -BigDecimal precioUnitario
+        -int cantidad
+        -List~ExtraSeleccionado~ extras
+        -String notasEspeciales
+        +precioUnitarioConExtras() BigDecimal
+        +subtotal() BigDecimal
+    }
+    class Cliente {
+        <<record>>
+        String nombre
+        String email
+    }
+    class ExtraSeleccionado {
+        <<record>>
+        Long extraId
+        String nombre
+        BigDecimal precioAdicional
+    }
+    class EstadoPedido {
+        <<interface>>
+        +tipo() EstadoPedidoTipo
+        +siguiente() EstadoPedido
+        +cancelar(ActorCancelacion) EstadoPedido
+        +esFinal() boolean
+    }
+    class EstadoRecibido
+    class EstadoEnPreparacion
+    class EstadoListo
+    class EstadoEntregado
+    class EstadoCancelado
+    class EstadoPedidoTipo {
+        <<enumeration>>
+        RECIBIDO
+        EN_PREPARACION
+        LISTO
+        ENTREGADO
+        CANCELADO
+        +crearEstado() EstadoPedido
+    }
+    class ActorCancelacion {
+        <<enumeration>>
+        CLIENTE
+        RESTAURANTE
+    }
+    class TipoPedido {
+        <<enumeration>>
+        LOCAL
+        DELIVERY
+    }
+
+    Pedido <|-- PedidoLocal
+    Pedido <|-- PedidoDelivery
+    PedidoBuilder ..> Pedido : crea
+    Pedido *-- "1..*" ItemPedido : items
+    Pedido *-- "1" Cliente
+    ItemPedido *-- "0..*" ExtraSeleccionado : extras
+    Pedido o-- "1" EstadoPedido : estado actual
+    EstadoPedido <|.. EstadoRecibido
+    EstadoPedido <|.. EstadoEnPreparacion
+    EstadoPedido <|.. EstadoListo
+    EstadoPedido <|.. EstadoEntregado
+    EstadoPedido <|.. EstadoCancelado
+    EstadoPedidoTipo ..> EstadoPedido : fabrica
+    Pedido ..> TipoPedido
+    EstadoPedido ..> ActorCancelacion

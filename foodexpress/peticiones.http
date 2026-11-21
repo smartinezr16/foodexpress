@@ -1,0 +1,166 @@
+### FoodExpress: recorrido de demostración
+### Se ejecuta con el cliente HTTP de IntelliJ IDEA o con la extensión "REST Client" de VS Code.
+### Los ids suponen los datos de ejemplo: restaurante 1 = La Brasa Roja,
+### plato 2 = Hamburguesa clásica (extras 1 y 2), plato 3 = Costillas BBQ (5 unidades), plato 4 = Limonada.
+### Confírmelos con las dos primeras peticiones.
+
+@restaurantes = http://localhost:8081
+@pedidos = http://localhost:8082
+@notificaciones = http://localhost:8083
+
+
+### 1. Restaurantes registrados
+GET {{restaurantes}}/api/restaurantes
+
+### 2. Menú del restaurante 1 (servido desde caché a partir de la segunda consulta)
+GET {{restaurantes}}/api/restaurantes/1/menu
+
+### 3. Menú filtrado: solo platos fuertes disponibles
+GET {{restaurantes}}/api/restaurantes/1/menu?categoria=PLATO_FUERTE&soloDisponibles=true
+
+
+### 4. Crear un pedido para recoger (publica pedido.creado)
+POST {{pedidos}}/api/pedidos
+Content-Type: application/json
+
+{
+  "restauranteId": 1,
+  "cliente": { "nombre": "Ana Gómez", "email": "ana@correo.com" },
+  "tipo": "LOCAL",
+  "items": [
+    { "platoId": 2, "cantidad": 2, "extraIds": [1, 2], "notasEspeciales": "Sin cebolla" },
+    { "platoId": 4, "cantidad": 1 }
+  ]
+}
+
+### 5. Avanzar el pedido 1: RECIBIDO -> EN_PREPARACION (publica pedido.estado.cambiado)
+PATCH {{pedidos}}/api/pedidos/1/avanzar
+
+### 6. Avanzar: EN_PREPARACION -> LISTO (además envía correo al cliente)
+PATCH {{pedidos}}/api/pedidos/1/avanzar
+
+### 7. Avanzar: LISTO -> ENTREGADO
+PATCH {{pedidos}}/api/pedidos/1/avanzar
+
+### 8. Intentar avanzar un pedido entregado: 409, el estado no lo permite
+PATCH {{pedidos}}/api/pedidos/1/avanzar
+
+### 9. Notificaciones que generó el pedido 1
+GET {{notificaciones}}/api/notificaciones?pedidoId=1
+
+
+### 10. Pedido a domicilio con un plato de inventario limitado (Costillas: 5 unidades)
+POST {{pedidos}}/api/pedidos
+Content-Type: application/json
+
+{
+  "restauranteId": 1,
+  "cliente": { "nombre": "Luis Pérez", "email": "luis@correo.com" },
+  "tipo": "DELIVERY",
+  "direccionEntrega": "Carrera 7 # 40-62, apto 301",
+  "items": [
+    { "platoId": 3, "cantidad": 5, "extraIds": [3] }
+  ]
+}
+
+### 11. Las costillas quedaron agotadas (Restaurantes consumió pedido.creado)
+GET {{restaurantes}}/api/platos/3
+
+### 12. Pedir costillas otra vez: 422, el plato no está disponible
+POST {{pedidos}}/api/pedidos
+Content-Type: application/json
+
+{
+  "restauranteId": 1,
+  "cliente": { "nombre": "Marta Ruiz", "email": "marta@correo.com" },
+  "tipo": "LOCAL",
+  "items": [ { "platoId": 3, "cantidad": 1 } ]
+}
+
+### 13. El cliente cancela el pedido 2 (publica pedido.cancelado; se devuelven las 5 unidades)
+POST {{pedidos}}/api/pedidos/2/cancelar
+Content-Type: application/json
+
+{ "canceladoPor": "CLIENTE", "motivo": "Me equivoqué de dirección" }
+
+### 14. Las costillas vuelven a estar disponibles
+GET {{restaurantes}}/api/platos/3
+
+
+### 15. Regla del patrón State: en preparación, el cliente ya no puede cancelar
+POST {{pedidos}}/api/pedidos
+Content-Type: application/json
+
+{
+  "restauranteId": 1,
+  "cliente": { "nombre": "Ana Gómez", "email": "ana@correo.com" },
+  "tipo": "LOCAL",
+  "items": [ { "platoId": 4, "cantidad": 2 } ]
+}
+
+###
+PATCH {{pedidos}}/api/pedidos/3/avanzar
+
+### 409: solo el restaurante puede cancelar en este estado
+POST {{pedidos}}/api/pedidos/3/cancelar
+Content-Type: application/json
+
+{ "canceladoPor": "CLIENTE", "motivo": "Ya no lo quiero" }
+
+### El restaurante sí puede
+POST {{pedidos}}/api/pedidos/3/cancelar
+Content-Type: application/json
+
+{ "canceladoPor": "RESTAURANTE", "motivo": "Se acabaron los limones" }
+
+
+### 16. Pedidos de un cliente
+GET {{pedidos}}/api/pedidos?clienteEmail=ana@correo.com
+
+### 17. Pedidos de un restaurante
+GET {{pedidos}}/api/pedidos?restauranteId=1
+
+
+### --- Administración del menú ---
+
+### Registrar un restaurante (queda CERRADO hasta que se abra)
+POST {{restaurantes}}/api/restaurantes
+Content-Type: application/json
+
+{
+  "nombre": "Pizzería Napoli",
+  "direccion": "Calle 85 # 12-30, Bogotá",
+  "telefono": "6015550000",
+  "horaApertura": "12:00",
+  "horaCierre": "23:00"
+}
+
+### Agregar un plato con 10 unidades
+POST {{restaurantes}}/api/restaurantes/3/platos
+Content-Type: application/json
+
+{
+  "nombre": "Pizza margarita",
+  "descripcion": "Mediana, 6 porciones",
+  "precio": 32000,
+  "categoria": "PLATO_FUERTE",
+  "unidadesDisponibles": 10
+}
+
+### Agregar un extra al plato
+POST {{restaurantes}}/api/platos/9/extras
+Content-Type: application/json
+
+{ "nombre": "Borde de queso", "precioAdicional": 5000 }
+
+### Abrir el restaurante
+PATCH {{restaurantes}}/api/restaurantes/3/estado
+Content-Type: application/json
+
+{ "estado": "ABIERTO" }
+
+### Retirar un plato de la carta
+PATCH {{restaurantes}}/api/platos/9/disponibilidad
+Content-Type: application/json
+
+{ "habilitado": false }

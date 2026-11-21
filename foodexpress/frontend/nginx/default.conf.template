@@ -1,0 +1,54 @@
+# Nginx sirve el frontend compilado y hace de proxy inverso hacia los microservicios.
+# El navegador habla con un solo origen (puerto 3000), así que no hace falta configurar CORS.
+#
+# Las variables ${...} las reemplaza la imagen oficial de Nginx al arrancar (envsubst);
+# sus valores por defecto están en el Dockerfile.
+
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # DNS interno de Docker. Con variables en proxy_pass, Nginx resuelve los nombres en cada
+    # petición: si un servicio aún no ha arrancado, Nginx no falla al iniciar y responde 502.
+    resolver ${DNS_RESOLVER} valid=10s ipv6=off;
+
+    set $restaurantes   ${RESTAURANTES_UPSTREAM};
+    set $pedidos        ${PEDIDOS_UPSTREAM};
+    set $notificaciones ${NOTIFICACIONES_UPSTREAM};
+
+    # --- Restaurantes y Menú ---
+    location /api/restaurantes { proxy_pass http://$restaurantes; include /etc/nginx/proxy_comun.conf; }
+    location /api/platos       { proxy_pass http://$restaurantes; include /etc/nginx/proxy_comun.conf; }
+
+    # --- Pedidos ---
+    location /api/pedidos      { proxy_pass http://$pedidos; include /etc/nginx/proxy_comun.conf; }
+
+    # --- Notificaciones (REST y WebSocket) ---
+    location /api/notificaciones { proxy_pass http://$notificaciones; include /etc/nginx/proxy_comun.conf; }
+
+    # El WebSocket necesita las cabeceras de "upgrade" y una conexión de larga duración.
+    location /ws {
+        proxy_pass http://$notificaciones;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 1h;
+    }
+
+    # --- Aplicación React (SPA) ---
+    # Los archivos con hash en el nombre se pueden guardar en caché indefinidamente.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Cualquier otra ruta (/pedidos/5, /cocina/1...) la resuelve React Router.
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}

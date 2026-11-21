@@ -1,0 +1,39 @@
+---
+title: GitFlow de FoodExpress (flujo previsto)
+---
+gitGraph
+    commit id: "importar base" tag: "v0.1.0"
+    branch develop
+    checkout develop
+    commit id: "configurar develop"
+    branch feature/RF-10-reordenar-pedido
+    checkout feature/RF-10-reordenar-pedido
+    commit id: "feat(pedidos): reordenar"
+    commit id: "test(pedidos): reordenar"
+    checkout develop
+    branch ci/github-actions
+    checkout ci/github-actions
+    commit id: "ci: mvn y npm test"
+    checkout develop
+    merge feature/RF-10-reordenar-pedido id: "PR revisado 1"
+    branch feature/RF-10-boton-reordenar
+    checkout feature/RF-10-boton-reordenar
+    commit id: "feat(frontend): reordenar"
+    checkout develop
+    merge ci/github-actions id: "PR revisado 2"
+    merge feature/RF-10-boton-reordenar id: "PR revisado 3"
+    branch release/1.0.0
+    checkout release/1.0.0
+    commit id: "chore: versión 1.0.0"
+    checkout main
+    merge release/1.0.0 tag: "v1.0.0"
+    checkout develop
+    merge release/1.0.0
+    checkout main
+    branch hotfix/ejemplo
+    checkout hotfix/ejemplo
+    commit id: "fix: si hiciera falta"
+    checkout main
+    merge hotfix/ejemplo tag: "v1.0.1"
+    checkout develop
+    merge hotfix/ejemplo

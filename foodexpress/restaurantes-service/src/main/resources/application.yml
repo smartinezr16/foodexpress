@@ -1,0 +1,54 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  application:
+    name: restaurantes-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/restaurantes_db}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        # Carga los extras de varios platos en una sola consulta (evita el problema N+1)
+        default_batch_fetch_size: 50
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        # Tras agotar los reintentos el mensaje no vuelve a la cola: va a la cola de muertos
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1s
+          multiplier: 2.0
+  cache:
+    type: caffeine
+    cache-names: menus
+    caffeine:
+      # Hasta 500 menús en memoria; cada uno se refresca como máximo cada 60 segundos
+      spec: maximumSize=500,expireAfterWrite=60s
+
+foodexpress:
+  seed:
+    # Crea restaurantes y platos de ejemplo si la base de datos está vacía
+    enabled: ${SEED_ENABLED:true}
+
+# Health check que usa docker-compose: /actuator/health responde 200 (UP) solo si la base de datos
+# y RabbitMQ responden; si no, 503 (DOWN) y Compose no arranca los servicios que dependen de este.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

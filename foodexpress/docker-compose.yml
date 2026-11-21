@@ -1,0 +1,213 @@
+# FoodExpress: infraestructura, los tres microservicios y el frontend.
+#
+#   1. cp .env.example .env          (y cambie las claves)
+#   2. docker compose up --build     ->  http://localhost:3000
+#
+# Las credenciales NO están en este archivo: se leen de .env. Si falta una variable
+# obligatoria, Compose se detiene antes de arrancar y dice cuál es.
+#
+# Redes: cada servicio solo ve lo que necesita. Por ejemplo, Pedidos no puede llegar a la
+# base de datos de Restaurantes: "una base de datos por servicio" se cumple también en la red.
+
+x-servicio-spring: &servicio-spring
+  restart: unless-stopped
+  healthcheck:
+    # /actuator/health responde 200 solo cuando el servicio está conectado a su base de datos y a RabbitMQ
+    test: ["CMD-SHELL", "curl -fsS http://localhost:$${SERVER_PORT}/actuator/health || exit 1"]
+    interval: 10s
+    timeout: 5s
+    retries: 10
+    start_period: 60s
+
+services:
+
+  # ------------------------------------------------------------------ Bases de datos (una por servicio)
+
+  postgres-restaurantes:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: ${RESTAURANTES_DB_NAME:?Defina RESTAURANTES_DB_NAME en .env}
+      POSTGRES_USER: ${RESTAURANTES_DB_USER:?Defina RESTAURANTES_DB_USER en .env}
+      POSTGRES_PASSWORD: ${RESTAURANTES_DB_PASSWORD:?Defina RESTAURANTES_DB_PASSWORD en .env}
+    volumes:
+      - datos-restaurantes:/var/lib/postgresql/data
+    networks: [red-datos-restaurantes]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-pedidos:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: ${PEDIDOS_DB_NAME:?Defina PEDIDOS_DB_NAME en .env}
+      POSTGRES_USER: ${PEDIDOS_DB_USER:?Defina PEDIDOS_DB_USER en .env}
+      POSTGRES_PASSWORD: ${PEDIDOS_DB_PASSWORD:?Defina PEDIDOS_DB_PASSWORD en .env}
+    volumes:
+      - datos-pedidos:/var/lib/postgresql/data
+    networks: [red-datos-pedidos]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-notificaciones:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: ${NOTIFICACIONES_DB_NAME:?Defina NOTIFICACIONES_DB_NAME en .env}
+      POSTGRES_USER: ${NOTIFICACIONES_DB_USER:?Defina NOTIFICACIONES_DB_USER en .env}
+      POSTGRES_PASSWORD: ${NOTIFICACIONES_DB_PASSWORD:?Defina NOTIFICACIONES_DB_PASSWORD en .env}
+    volumes:
+      - datos-notificaciones:/var/lib/postgresql/data
+    networks: [red-datos-notificaciones]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ------------------------------------------------------------------ Mensajería y correo
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?Defina RABBITMQ_USER en .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Defina RABBITMQ_PASSWORD en .env}
+    ports:
+      - "15672:15672"   # Consola web de RabbitMQ: ver colas, mensajes y la cola de mensajes muertos
+    volumes:
+      - datos-rabbitmq:/var/lib/rabbitmq
+    networks: [red-mensajeria]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  # Servidor de correo de pruebas: captura los correos y los muestra en una bandeja web
+  mailpit:
+    image: axllent/mailpit:v1.22.3
+    ports:
+      - "8025:8025"     # Bandeja web de Mailpit: ver los correos enviados a los clientes
+    networks: [red-correo]
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ------------------------------------------------------------------ Microservicios
+
+  restaurantes-service:
+    <<: *servicio-spring
+    build: ./restaurantes-service
+    environment:
+      SERVER_PORT: 8081
+      DB_URL: jdbc:postgresql://postgres-restaurantes:5432/${RESTAURANTES_DB_NAME}
+      DB_USER: ${RESTAURANTES_DB_USER}
+      DB_PASSWORD: ${RESTAURANTES_DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      SEED_ENABLED: ${SEED_ENABLED:-true}
+    ports:
+      - "8081:8081"     # API de Restaurantes y Menú: pruebas con peticiones.http o Postman
+    networks: [red-datos-restaurantes, red-mensajeria, red-servicios, red-web]
+    depends_on:
+      postgres-restaurantes:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notificaciones-service:
+    <<: *servicio-spring
+    build: ./notificaciones-service
+    environment:
+      SERVER_PORT: 8083
+      DB_URL: jdbc:postgresql://postgres-notificaciones:5432/${NOTIFICACIONES_DB_NAME}
+      DB_USER: ${NOTIFICACIONES_DB_USER}
+      DB_PASSWORD: ${NOTIFICACIONES_DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      MAIL_FROM: ${MAIL_FROM:-pedidos@foodexpress.local}
+    ports:
+      - "8083:8083"     # API de Notificaciones y WebSocket: pruebas directas sin pasar por el frontend
+    networks: [red-datos-notificaciones, red-mensajeria, red-correo, red-web]
+    depends_on:
+      postgres-notificaciones:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+
+  pedidos-service:
+    <<: *servicio-spring
+    build: ./pedidos-service
+    environment:
+      SERVER_PORT: 8082
+      DB_URL: jdbc:postgresql://postgres-pedidos:5432/${PEDIDOS_DB_NAME}
+      DB_USER: ${PEDIDOS_DB_USER}
+      DB_PASSWORD: ${PEDIDOS_DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RESTAURANTES_URL: http://restaurantes-service:8081
+      TASA_IMPUESTO: ${TASA_IMPUESTO:-0.08}
+      COSTO_DOMICILIO: ${COSTO_DOMICILIO:-5000}
+    ports:
+      - "8082:8082"     # API de Pedidos: pruebas con peticiones.http o Postman
+    networks: [red-datos-pedidos, red-mensajeria, red-servicios, red-web]
+    depends_on:
+      postgres-pedidos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      # Pedidos valida el menú contra Restaurantes, y los consumidores deben tener sus colas
+      # creadas antes de que se publique el primer evento
+      restaurantes-service:
+        condition: service_healthy
+      notificaciones-service:
+        condition: service_healthy
+
+  # ------------------------------------------------------------------ Frontend
+
+  # React servido por Nginx, que además enruta /api y /ws hacia cada microservicio
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"       # Aplicación web: el único puerto que necesita un usuario final
+    networks: [red-web]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      restaurantes-service:
+        condition: service_healthy
+      pedidos-service:
+        condition: service_healthy
+      notificaciones-service:
+        condition: service_healthy
+
+networks:
+  red-datos-restaurantes:   # Restaurantes y su base de datos
+  red-datos-pedidos:        # Pedidos y su base de datos
+  red-datos-notificaciones: # Notificaciones y su base de datos
+  red-mensajeria:           # RabbitMQ y los tres servicios
+  red-correo:               # Notificaciones y el servidor de correo
+  red-servicios:            # Llamada síncrona de Pedidos a Restaurantes (validar el menú)
+  red-web:                  # Frontend (Nginx) y los tres servicios que expone
+
+volumes:
+  datos-restaurantes:
+  datos-pedidos:
+  datos-notificaciones:
+  datos-rabbitmq:

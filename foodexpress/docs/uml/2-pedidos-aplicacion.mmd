@@ -1,0 +1,74 @@
+---
+title: Pedidos · Casos de uso, puertos y adaptadores (DIP)
+---
+classDiagram
+    direction LR
+    class PedidoController {
+        <<adaptador de entrada>>
+        +crear(CrearPedidoRequest) PedidoResponse
+        +obtener(Long) PedidoResponse
+        +listar(Long, String) List
+        +avanzar(Long) PedidoResponse
+        +cancelar(Long, CancelarPedidoRequest) PedidoResponse
+    }
+    class CrearPedidoUseCase {
+        +ejecutar(CrearPedidoCommand) Pedido
+    }
+    class AvanzarEstadoPedidoUseCase {
+        +ejecutar(Long) Pedido
+    }
+    class CancelarPedidoUseCase {
+        +ejecutar(Long, ActorCancelacion, String) Pedido
+    }
+    class ConsultarPedidosUseCase {
+        +porId(Long) Pedido
+        +porRestaurante(Long) List~Pedido~
+        +porCliente(String) List~Pedido~
+    }
+    class PedidoRepository {
+        <<interface>>
+        +guardar(Pedido) Pedido
+        +buscarPorId(Long) Optional~Pedido~
+        +buscarPorRestaurante(Long) List~Pedido~
+        +buscarPorCliente(String) List~Pedido~
+    }
+    class MenuRepository {
+        <<interface>>
+        +obtenerRestaurante(Long) RestauranteInfo
+        +obtenerPlatos(Long, Collection~Long~) List~PlatoMenu~
+    }
+    class PedidoEventPublisher {
+        <<interface>>
+        +pedidoCreado(Pedido)
+        +estadoCambiado(Pedido, EstadoPedidoTipo)
+        +pedidoCancelado(Pedido, EstadoPedidoTipo)
+    }
+    class PedidoRepositoryAdapter {
+        <<Spring Data JPA>>
+    }
+    class MenuRepositoryRestAdapter {
+        <<RestClient HTTP>>
+    }
+    class PedidoEventPublisherRabbit {
+        <<Spring AMQP>>
+    }
+    class Pedido {
+        <<dominio>>
+    }
+
+    PedidoController --> CrearPedidoUseCase
+    PedidoController --> AvanzarEstadoPedidoUseCase
+    PedidoController --> CancelarPedidoUseCase
+    PedidoController --> ConsultarPedidosUseCase
+    CrearPedidoUseCase --> MenuRepository
+    CrearPedidoUseCase --> PedidoRepository
+    CrearPedidoUseCase --> PedidoEventPublisher
+    AvanzarEstadoPedidoUseCase --> PedidoRepository
+    AvanzarEstadoPedidoUseCase --> PedidoEventPublisher
+    CancelarPedidoUseCase --> PedidoRepository
+    CancelarPedidoUseCase --> PedidoEventPublisher
+    ConsultarPedidosUseCase --> PedidoRepository
+    CrearPedidoUseCase ..> Pedido : construye
+    PedidoRepository <|.. PedidoRepositoryAdapter
+    MenuRepository <|.. MenuRepositoryRestAdapter
+    PedidoEventPublisher <|.. PedidoEventPublisherRabbit

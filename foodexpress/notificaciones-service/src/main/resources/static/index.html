@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FoodExpress · Notificaciones en tiempo real</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1f2933; }
+        h1 { font-size: 1.4rem; }
+        p.ayuda { color: #52606d; }
+        form { display: flex; gap: .75rem; flex-wrap: wrap; align-items: end; margin: 1rem 0; }
+        label { display: flex; flex-direction: column; font-size: .85rem; gap: .25rem; }
+        input { padding: .45rem .6rem; border: 1px solid #9aa5b1; border-radius: 6px; width: 9rem; }
+        button { padding: .5rem 1rem; border: 0; border-radius: 6px; background: #c2410c; color: #fff; cursor: pointer; }
+        #estado { font-size: .85rem; color: #52606d; }
+        #mensajes { list-style: none; padding: 0; }
+        #mensajes li { border: 1px solid #d9e2ec; border-left: 4px solid #c2410c; border-radius: 6px; padding: .6rem .8rem; margin-bottom: .5rem; }
+        #mensajes small { color: #52606d; }
+    </style>
+</head>
+<body>
+<h1>Notificaciones en tiempo real</h1>
+<p class="ayuda">
+    Página de prueba del canal WebSocket. Escriba el id de un pedido para seguirlo como cliente,
+    el id de un restaurante para ver sus pedidos nuevos, o ambos.
+</p>
+
+<form id="formulario">
+    <label>Pedido (cliente)
+        <input id="pedidoId" type="number" min="1" placeholder="p. ej. 1">
+    </label>
+    <label>Restaurante
+        <input id="restauranteId" type="number" min="1" placeholder="p. ej. 1">
+    </label>
+    <button type="submit">Suscribirse</button>
+</form>
+<p id="estado">Sin conexión.</p>
+<ul id="mensajes"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+<script>
+    const estado = document.getElementById('estado');
+    const mensajes = document.getElementById('mensajes');
+    let cliente = null;
+
+    function mostrar(origen, cuerpo) {
+        const n = JSON.parse(cuerpo);
+        const li = document.createElement('li');
+        const titulo = document.createElement('strong');
+        titulo.textContent = n.titulo;
+        const texto = document.createElement('div');
+        texto.textContent = n.mensaje;
+        const pie = document.createElement('small');
+        pie.textContent = origen + ' · ' + n.tipoEvento + ' · ' + new Date(n.fecha).toLocaleTimeString();
+        li.append(titulo, texto, pie);
+        mensajes.prepend(li);
+    }
+
+    document.getElementById('formulario').addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        const pedidoId = document.getElementById('pedidoId').value;
+        const restauranteId = document.getElementById('restauranteId').value;
+        if (!pedidoId && !restauranteId) {
+            estado.textContent = 'Escriba un id de pedido o de restaurante.';
+            return;
+        }
+        if (cliente) {
+            cliente.deactivate();
+        }
+        const protocolo = location.protocol === 'https:' ? 'wss://' : 'ws://';
+        cliente = new StompJs.Client({ brokerURL: protocolo + location.host + '/ws', reconnectDelay: 3000 });
+        cliente.onConnect = function () {
+            const temas = [];
+            if (pedidoId) {
+                cliente.subscribe('/topic/pedidos/' + pedidoId, m => mostrar('Pedido ' + pedidoId, m.body));
+                temas.push('pedido ' + pedidoId);
+            }
+            if (restauranteId) {
+                cliente.subscribe('/topic/restaurantes/' + restauranteId, m => mostrar('Restaurante ' + restauranteId, m.body));
+                temas.push('restaurante ' + restauranteId);
+            }
+            estado.textContent = 'Conectado. Escuchando: ' + temas.join(' y ') + '.';
+        };
+        cliente.onWebSocketClose = function () {
+            estado.textContent = 'Conexión cerrada. Reintentando…';
+        };
+        cliente.activate();
+    });
+</script>
+</body>
+</html>

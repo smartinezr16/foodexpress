@@ -1,0 +1,44 @@
+server:
+  port: ${SERVER_PORT:8082}
+
+spring:
+  application:
+    name: pedidos-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/pedidos_db}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        # Carga los ítems y extras de varios pedidos en pocas consultas (evita el problema N+1)
+        default_batch_fetch_size: 50
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+
+foodexpress:
+  restaurantes:
+    # Dirección del microservicio de Restaurantes (consulta síncrona del menú)
+    url: ${RESTAURANTES_URL:http://localhost:8081}
+  pedidos:
+    # Impoconsumo del 8 % sobre platos y extras
+    tasa-impuesto: ${TASA_IMPUESTO:0.08}
+    # Valor fijo del domicilio, en pesos
+    costo-domicilio: ${COSTO_DOMICILIO:5000}
+
+# Health check que usa docker-compose: /actuator/health responde 200 (UP) solo si la base de datos
+# y RabbitMQ responden; si no, 503 (DOWN) y Compose no arranca los servicios que dependen de este.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

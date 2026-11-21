@@ -1,0 +1,120 @@
+---
+title: Restaurantes y Menú · Dominio, puertos segregados (ISP) y caché (OCP)
+---
+classDiagram
+    direction TB
+    class Restaurante {
+        -Long id
+        -String nombre
+        -String direccion
+        -String telefono
+        -LocalTime horaApertura
+        -LocalTime horaCierre
+        -EstadoRestaurante estado
+        +registrar(...)$ Restaurante
+        +abrir()
+        +cerrar()
+        +estaAbierto() boolean
+    }
+    class Plato {
+        -Long id
+        -Long version
+        -Long restauranteId
+        -String nombre
+        -String descripcion
+        -BigDecimal precio
+        -CategoriaPlato categoria
+        -boolean habilitado
+        -Integer unidadesDisponibles
+        +estaDisponible() boolean
+        +cambiarDisponibilidad(boolean, Integer)
+        +descontarUnidades(int)
+        +reponerUnidades(int)
+        +agregarExtra(String, BigDecimal)
+        +quitarExtra(Long)
+    }
+    class Extra {
+        <<record>>
+        Long id
+        String nombre
+        BigDecimal precioAdicional
+    }
+    class CategoriaPlato {
+        <<enumeration>>
+        ENTRADA
+        PLATO_FUERTE
+        BEBIDA
+        POSTRE
+    }
+    class EstadoRestaurante {
+        <<enumeration>>
+        ABIERTO
+        CERRADO
+    }
+    class MenuQueryService {
+        <<interface>>
+        +consultarMenu(Long) List~Plato~
+        +obtenerPlatos(Long, Collection~Long~) List~Plato~
+        +obtenerPlato(Long) Plato
+    }
+    class MenuAdminService {
+        <<interface>>
+        +agregarPlato(Long, DatosPlato) Plato
+        +actualizarPlato(Long, DatosPlato) Plato
+        +cambiarDisponibilidad(Long, boolean, Integer) Plato
+        +eliminarPlato(Long)
+        +agregarExtra(Long, String, BigDecimal) Plato
+        +quitarExtra(Long, Long) Plato
+    }
+    class InventarioService {
+        <<interface>>
+        +descontarPorPedidoCreado(String, List~MovimientoInventario~)
+        +reponerPorPedidoCancelado(String, List~MovimientoInventario~)
+    }
+    class ConsultarMenuUseCase
+    class MenuQueryServiceCacheado {
+        <<decorador con @Cacheable>>
+    }
+    class GestionarMenuUseCase
+    class AjustarInventarioUseCase
+    class PlatoRepository {
+        <<interface>>
+    }
+    class RestauranteRepository {
+        <<interface>>
+    }
+    class MenuCache {
+        <<interface>>
+        +invalidar(Long)
+    }
+    class EventoProcesadoRepository {
+        <<interface>>
+        +registrarSiEsNuevo(String) boolean
+    }
+    class MenuController {
+        <<solo lectura>>
+    }
+    class MenuAdminController
+    class PedidoEventosListener {
+        <<consumidor RabbitMQ>>
+    }
+
+    Restaurante "1" --> "0..*" Plato : restauranteId
+    Plato *-- "0..*" Extra : extras
+    Plato ..> CategoriaPlato
+    Restaurante ..> EstadoRestaurante
+    MenuQueryService <|.. ConsultarMenuUseCase
+    MenuQueryService <|.. MenuQueryServiceCacheado
+    MenuQueryServiceCacheado --> ConsultarMenuUseCase : delega
+    MenuAdminService <|.. GestionarMenuUseCase
+    InventarioService <|.. AjustarInventarioUseCase
+    MenuController --> MenuQueryService
+    MenuAdminController --> MenuAdminService
+    PedidoEventosListener --> InventarioService
+    GestionarMenuUseCase --> PlatoRepository
+    GestionarMenuUseCase --> RestauranteRepository
+    GestionarMenuUseCase --> MenuCache
+    AjustarInventarioUseCase --> PlatoRepository
+    AjustarInventarioUseCase --> EventoProcesadoRepository
+    AjustarInventarioUseCase --> MenuCache
+    ConsultarMenuUseCase --> PlatoRepository
