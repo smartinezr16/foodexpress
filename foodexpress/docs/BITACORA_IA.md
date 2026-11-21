@@ -1,45 +1,138 @@
 # Bitácora de uso de inteligencia artificial
 
-**Proyecto:** FoodExpress · Diseño y Arquitectura de Software
-**Equipo:** [Integrante 1], [Integrante 2], [Integrante 3]
+**Proyecto:** FoodExpress  
+**Asignatura:** Diseño y Arquitectura de Software  
+**Integrantes:** Sebastián Quintero, Santiago Martínez y Juan David Borda  
+**Periodo:** Noviembre de 2026
 
-> Las secciones marcadas con **[Equipo: completar]** deben llenarlas los integrantes con su
-> propia experiencia. El resto describe lo que se hizo con la herramienta, en orden.
+## 1. Introducción
 
-## Herramienta utilizada
+Durante el desarrollo de FoodExpress utilizamos herramientas de inteligencia artificial como apoyo en distintas etapas del proyecto, desde la planificación inicial hasta la implementación y documentación.
 
-| Herramienta | Uso | Modelo |
-|---|---|---|
-| Claude (claude.ai, Anthropic), en modo agente con acceso a un espacio de trabajo con terminal | Análisis del catálogo, generación de código, pruebas, diagramas, documentación y presentación | Claude Fable 5.2 (15 de noviembre) y Claude Opus 5.5 (19 de noviembre) |
+Decidimos trabajar con Claude para facilitar la construcción de componentes, explorar soluciones técnicas y detectar posibles errores. Como equipo nos encargamos de seleccionar el proyecto, definir las tecnologías, establecer el alcance y realizar las verificaciones que estaban a nuestro alcance.
 
-## Registro de sesiones
+Esta bitácora presenta cómo utilizamos la herramienta, qué resultados obtuvimos, cuáles fueron sus limitaciones y qué actividades requirieron intervención del equipo.
 
-| # | Fecha | Objetivo (lo que se pidió) | Qué produjo la IA | Cómo se verificó | Decisión o ajuste humano |
-|---|---|---|---|---|---|
-| 1 | 2026-11-15 | Elegir proyecto entre los libres: Clínica veterinaria, GymTrack, FoodExpress y EventHub, adjuntando el catálogo en PDF. | Comparación de los cuatro proyectos por patrones, retos técnicos y dificultad; recomendó FoodExpress. | Se contrastó con el catálogo del curso. | **El equipo eligió FoodExpress.** |
-| 2 | 2026-11-15 | Definir cómo construirlo. | Preguntas de alcance antes de empezar. | — | El equipo escogió Java + Spring Boot, código completo y dejar la bonificación para después. |
-| 3 | 2026-11-15 | Construir el backend. | 3 microservicios con Clean Architecture; patrones Builder, State y Adapter; mensajería RabbitMQ con reintentos, colas de mensajes muertos e idempotencia; caché; Docker Compose; README; 66 pruebas unitarias. | La IA compiló y ejecutó las pruebas de dominio y casos de uso (66/66), verificó los contratos JSON entre servicios con Jackson y que las capas internas no importaran el framework. **No pudo ejecutar Spring ni Docker** en su entorno (sin acceso a Maven Central ni a Docker Hub) y lo advirtió. | El equipo ejecutó `docker compose up --build` en su máquina y **funcionó**. |
-| 4 | 2026-11-19 | Construir el frontend. | Aplicación React + Vite con TypeScript: restaurantes, menú, carrito, seguimiento en vivo, Mis pedidos y panel de Cocina; 6 pruebas unitarias del carrito. | La IA la probó en un navegador automatizado contra un backend simulado: 9 comprobaciones del flujo completo, incluido WebSocket, sin errores de consola. | La IA corrigió dos defectos que vio en las capturas: notificaciones duplicadas y menú desbordado en celular. [Equipo: completar revisión] |
-| 5 | 2026-11-19 | Dockerizar el frontend. | Dockerfile multietapa (Node → Nginx), Nginx como proxy inverso hacia los 3 servicios y el WebSocket; servicio en Docker Compose. | Se probó la configuración con Nginx real: encontró y corrigió una directiva duplicada que impedía arrancar. Se repitió el recorrido completo a través de Nginx. | [Equipo: confirmar `docker compose up --build` con el frontend] |
-| 6 | 2026-11-19 | Diagrama C4. | Diagramas de contexto, contenedores y componentes (servicio de Pedidos) en SVG, con su modelo en Structurizr DSL. | Revisión visual de cada diagrama; se reubicaron flechas que se cruzaban. | [Equipo: completar revisión] |
-| 7 | 2026-11-19 | Preparar la presentación. | Requisitos funcionales, presentación y esta bitácora. | — | [Equipo: completar revisión] |
-| 8 | 2026-11-19 | Alinear el proyecto con la guía de entrega final, adjuntando la guía en PDF. | Comparación sección por sección; Docker Compose con `.env`, health checks, redes y una base por servicio; C4 alineado con Compose; 4 diagramas de clases UML; 20 ADRs; 10 RF y 14 reglas de negocio; lecciones aprendidas; GitFlow con plan de trabajo; documento final. | `docker compose config` validado con y sin `.env`; renders de C4 y UML revisados; pruebas repetidas (66 + 6). **No se pudo ejecutar `docker compose up` en el entorno de la IA** (sin acceso a Docker Hub). | La IA advirtió que no fabricaría el historial de Git ni las métricas de participación. [Equipo: ejecutar `docker compose up --build` con el Compose nuevo] |
+## 2. Herramienta utilizada
 
-## Qué hizo la IA y qué hizo el equipo
+Utilizamos Claude, desarrollado por Anthropic, en un entorno de trabajo con acceso a archivos y terminal.
 
-**La IA:** propuso la elección de proyecto, generó la mayor parte del código del backend y del frontend, las pruebas, la configuración de Docker, los diagramas C4 y la documentación; detectó y corrigió errores al probar en su entorno.
+Las sesiones registradas corresponden al 15 y al 19 de noviembre de 2026. La herramienta se utilizó principalmente para apoyar el desarrollo de los microservicios, el frontend, las pruebas, la configuración de Docker y la documentación de arquitectura.
 
-**El equipo:** eligió el proyecto, la tecnología y el alcance; ejecutó el sistema en su máquina; [Equipo: completar con lo que cada integrante revisó, modificó, probó o explicó].
+## 3. Registro de actividades
 
-## Limitaciones y errores detectados
+### Sesión 1. Selección del proyecto — 15 de noviembre
 
-- La IA no pudo ejecutar el backend real (Spring, PostgreSQL, RabbitMQ) en su entorno; esa verificación la hizo el equipo.
-- El frontend se probó contra un backend simulado que imita las APIs; la integración real queda confirmada al ejecutar Docker Compose.
-- Errores de la IA corregidos por ella misma durante las pruebas: directiva duplicada en Nginx, notificaciones repetidas en el seguimiento, navegación móvil desbordada y flechas cruzadas en los diagramas.
-- El Docker Compose reescrito el 19 de noviembre (credenciales en `.env`, health checks, tres PostgreSQL) solo se validó en su sintaxis; debe probarse con `docker compose up --build`.
-- La IA no generó commits, pull requests ni métricas de Git: la sección B.4 depende del trabajo real del equipo.
-- [Equipo: agregar cualquier error encontrado al ejecutar o revisar.]
+Comenzamos revisando las alternativas disponibles en el catálogo de la asignatura: Clínica Veterinaria, GymTrack, FoodExpress y EventHub.
 
-## Reflexión del equipo
+Utilizamos Claude para comparar la complejidad técnica, los patrones de diseño y las funcionalidades de cada alternativa. Después de revisar la información, el equipo decidió desarrollar FoodExpress.
 
-[Equipo: completar. Por ejemplo: qué aprendieron al revisar el código generado, qué partes entienden y pueden defender en la sustentación, qué harían distinto y cómo validaron que la arquitectura cumple lo pedido.]
+### Sesión 2. Definición de tecnologías — 15 de noviembre
+
+Una vez seleccionado el proyecto, definimos las tecnologías y el alcance inicial.
+
+Escogimos Java con Spring Boot para el backend y posteriormente React con TypeScript para el frontend. También decidimos priorizar los requerimientos principales y dejar algunas funcionalidades adicionales para una etapa posterior.
+
+Claude ayudó a organizar la propuesta técnica a partir de estas decisiones.
+
+### Sesión 3. Desarrollo del backend — 15 de noviembre
+
+Utilizamos Claude para generar una primera implementación de los tres microservicios: Restaurantes, Pedidos y Notificaciones.
+
+La solución incorporó Clean Architecture, los patrones Builder, State y Adapter, comunicación mediante RabbitMQ y persistencia con PostgreSQL.
+
+También se generaron 66 pruebas automatizadas de dominio y casos de uso.
+
+Durante esta etapa, la herramienta reportó limitaciones para ejecutar determinadas dependencias y servicios de infraestructura. Por esta razón, fue necesario ejecutar el proyecto en un entorno local.
+
+El equipo realizó una ejecución mediante Docker Compose y comprobó el funcionamiento de la versión inicial.
+
+### Sesión 4. Desarrollo del frontend — 19 de noviembre
+
+Para la interfaz de usuario utilizamos React, TypeScript y Vite.
+
+Se desarrollaron las pantallas de restaurantes, menú, carrito de compras, seguimiento de pedidos, historial y panel de cocina.
+
+Claude realizó pruebas utilizando un backend simulado e identificó problemas relacionados con notificaciones duplicadas y visualización en dispositivos móviles.
+
+Estas observaciones permitieron realizar correcciones antes de continuar con la integración.
+
+### Sesión 5. Integración con Docker — 19 de noviembre
+
+Se incorporó el frontend al entorno de Docker mediante una configuración multietapa con Node.js y Nginx.
+
+También se configuró Nginx como proxy inverso para comunicar la interfaz con los tres microservicios.
+
+Durante las verificaciones se detectó una directiva duplicada en la configuración de Nginx. El problema fue corregido y se volvió a comprobar la configuración.
+
+La ejecución completa de la versión final de Docker Compose debe confirmarse en el entorno local del equipo.
+
+### Sesión 6. Diagramas de arquitectura — 19 de noviembre
+
+Utilizamos la herramienta para elaborar los diagramas C4 correspondientes al contexto, los contenedores y los componentes del sistema.
+
+Los diagramas se generaron a partir de la arquitectura propuesta y se realizaron ajustes visuales para mejorar la claridad de las relaciones entre componentes.
+
+También se incluyeron los archivos fuente para facilitar futuras modificaciones.
+
+### Sesión 7. Preparación de la documentación — 19 de noviembre
+
+Claude apoyó la organización de los requerimientos funcionales, la presentación del proyecto y el registro de las actividades realizadas con inteligencia artificial.
+
+Esta etapa permitió reunir la información técnica en documentos que facilitaran explicar la solución durante la entrega final.
+
+### Sesión 8. Revisión de los requerimientos de entrega — 19 de noviembre
+
+En la última etapa utilizamos la guía de entrega de la asignatura para revisar la documentación y los componentes desarrollados.
+
+Se realizaron ajustes en Docker Compose, los diagramas C4, los diagramas UML, los registros de decisiones arquitectónicas (ADR) y las reglas de negocio.
+
+También se documentó una propuesta de trabajo con GitFlow para organizar el control de versiones.
+
+Las pruebas automatizadas reportadas fueron 66 del backend y 6 del frontend. Sin embargo, la ejecución integral del Docker Compose actualizado quedó pendiente de confirmación local.
+
+## 4. Participación del equipo
+
+El desarrollo de FoodExpress combinó decisiones tomadas por los integrantes con el apoyo de herramientas de inteligencia artificial.
+
+Entre las principales actividades realizadas por el equipo estuvieron la selección del proyecto, la elección de tecnologías, la definición del alcance y la ejecución inicial del sistema mediante Docker Compose.
+
+Claude tuvo una participación importante en la generación del código, las pruebas y la documentación. Por ello, una parte fundamental del trabajo académico consiste en revisar los resultados, comprender la arquitectura propuesta y comprobar que las funcionalidades correspondan a los requerimientos establecidos.
+
+**Registro de aportes individuales por completar:**
+
+- **Sebastián Quintero:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
+- **Santiago Martínez:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
+- **Juan David Borda:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
+
+## 5. Dificultades y limitaciones
+
+Durante el proceso encontramos varias situaciones que requirieron atención.
+
+Una de las principales dificultades fue que el entorno de Claude no permitía ejecutar completamente algunos componentes del backend y de Docker. Esto hizo necesario diferenciar las pruebas automatizadas de las verificaciones realizadas sobre la aplicación completa.
+
+También se identificaron errores en la configuración de Nginx, notificaciones duplicadas y problemas de visualización en pantallas pequeñas.
+
+Otro aspecto importante fue que el proyecto se desarrolló inicialmente sin un repositorio de Git. Por esa razón, el historial de commits no representa todas las etapas de construcción y la estrategia GitFlow quedó planteada para el trabajo posterior.
+
+Estas situaciones evidenciaron la importancia de realizar pruebas en el entorno real y mantener un registro de los cambios desde el comienzo.
+
+## 6. Reflexión final
+
+El desarrollo de FoodExpress nos permitió conocer mejor cómo se organiza una aplicación basada en microservicios y cómo se relacionan sus diferentes componentes.
+
+El uso de inteligencia artificial facilitó la generación de código y documentación, pero también nos mostró que una solución generada automáticamente necesita verificaciones. No basta con que el código esté escrito: es necesario comprobar que funcione, que las tecnologías se comuniquen correctamente y que se cumplan las reglas de negocio.
+
+Una de las principales lecciones del proyecto fue la importancia de organizar el trabajo desde el inicio, utilizar control de versiones y realizar pruebas de integración.
+
+Como mejora para futuros proyectos, consideramos importante incorporar Git desde la primera etapa, distribuir las responsabilidades de forma más clara y documentar las decisiones técnicas a medida que se toman.
+
+## 7. Conclusión
+
+La inteligencia artificial fue una herramienta importante durante el desarrollo de FoodExpress, especialmente en la implementación técnica y la preparación de los entregables.
+
+Su utilización permitió construir una solución con tres microservicios, una interfaz web y mecanismos de comunicación entre servicios.
+
+El proyecto también puso de manifiesto la necesidad de complementar el trabajo automatizado con decisiones humanas, revisión técnica y pruebas de funcionamiento.
+
+La experiencia nos permitió identificar tanto las ventajas como las limitaciones de incorporar inteligencia artificial en el desarrollo de software.
