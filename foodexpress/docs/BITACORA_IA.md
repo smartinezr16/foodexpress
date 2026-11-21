@@ -2,137 +2,130 @@
 
 **Proyecto:** FoodExpress  
 **Asignatura:** Diseño y Arquitectura de Software  
-**Integrantes:** Sebastián Quintero, Santiago Martínez y Juan David Borda  
-**Periodo:** Noviembre de 2026
+**Integrantes:** Sebastián Quintero, Santiago Martínez y Juan David Borda
 
 ## 1. Introducción
 
-Durante el desarrollo de FoodExpress utilizamos herramientas de inteligencia artificial como apoyo en distintas etapas del proyecto, desde la planificación inicial hasta la implementación y documentación.
+Durante la construcción de FoodExpress utilizamos inteligencia artificial como una herramienta de apoyo para orientar el desarrollo del proyecto, resolver dudas técnicas y evaluar diferentes alternativas de implementación.
 
-Decidimos trabajar con Claude para facilitar la construcción de componentes, explorar soluciones técnicas y detectar posibles errores. Como equipo nos encargamos de seleccionar el proyecto, definir las tecnologías, establecer el alcance y realizar las verificaciones que estaban a nuestro alcance.
+Nuestro propósito al utilizarla fue contar con una fuente adicional de orientación que nos permitiera comprender mejor algunos conceptos de arquitectura de software y encontrar soluciones a las dificultades que surgieron durante el proceso.
 
-Esta bitácora presenta cómo utilizamos la herramienta, qué resultados obtuvimos, cuáles fueron sus limitaciones y qué actividades requirieron intervención del equipo.
+La herramienta también participó en la generación de componentes de código, pruebas y documentación. Como equipo definimos el proyecto, las tecnologías y el alcance, y realizamos verificaciones de funcionamiento.
 
 ## 2. Herramienta utilizada
 
-Utilizamos Claude, desarrollado por Anthropic, en un entorno de trabajo con acceso a archivos y terminal.
+La herramienta utilizada fue Claude, desarrollada por Anthropic.
 
-Las sesiones registradas corresponden al 15 y al 19 de noviembre de 2026. La herramienta se utilizó principalmente para apoyar el desarrollo de los microservicios, el frontend, las pruebas, la configuración de Docker y la documentación de arquitectura.
+La empleamos para consultar conceptos técnicos, comparar alternativas de diseño, estructurar componentes, generar implementaciones y apoyar la revisión de errores.
 
-## 3. Registro de actividades
+Su utilización estuvo relacionada principalmente con la arquitectura de microservicios, los patrones de diseño, la comunicación entre servicios, las pruebas y la documentación técnica.
 
-### Sesión 1. Selección del proyecto — 15 de noviembre
+## 3. Aplicación de la inteligencia artificial durante el proyecto
 
-Comenzamos revisando las alternativas disponibles en el catálogo de la asignatura: Clínica Veterinaria, GymTrack, FoodExpress y EventHub.
+### Selección y planificación
 
-Utilizamos Claude para comparar la complejidad técnica, los patrones de diseño y las funcionalidades de cada alternativa. Después de revisar la información, el equipo decidió desarrollar FoodExpress.
+En la etapa inicial utilizamos la IA para comparar las alternativas disponibles y comprender los principales retos técnicos de cada una.
 
-### Sesión 2. Definición de tecnologías — 15 de noviembre
+A partir de este análisis, el equipo seleccionó FoodExpress y definió el alcance de la solución.
 
-Una vez seleccionado el proyecto, definimos las tecnologías y el alcance inicial.
+También utilizamos la herramienta para evaluar tecnologías y organizar la estructura general del sistema.
 
-Escogimos Java con Spring Boot para el backend y posteriormente React con TypeScript para el frontend. También decidimos priorizar los requerimientos principales y dejar algunas funcionalidades adicionales para una etapa posterior.
+### Arquitectura del software
 
-Claude ayudó a organizar la propuesta técnica a partir de estas decisiones.
+La IA nos permitió explorar diferentes alternativas para organizar los componentes y comprender cómo aplicar Clean Architecture en una solución basada en microservicios.
 
-### Sesión 3. Desarrollo del backend — 15 de noviembre
+Se trabajó con tres servicios principales:
 
-Utilizamos Claude para generar una primera implementación de los tres microservicios: Restaurantes, Pedidos y Notificaciones.
+- Restaurantes y Menú.
+- Pedidos.
+- Notificaciones.
 
-La solución incorporó Clean Architecture, los patrones Builder, State y Adapter, comunicación mediante RabbitMQ y persistencia con PostgreSQL.
+También se abordó la aplicación de los patrones Builder, State y Adapter, relacionándolos con las necesidades del sistema.
 
-También se generaron 66 pruebas automatizadas de dominio y casos de uso.
+La herramienta contribuyó tanto a la explicación de estas soluciones como a la generación de parte de su implementación.
 
-Durante esta etapa, la herramienta reportó limitaciones para ejecutar determinadas dependencias y servicios de infraestructura. Por esta razón, fue necesario ejecutar el proyecto en un entorno local.
+### Desarrollo del backend
 
-El equipo realizó una ejecución mediante Docker Compose y comprobó el funcionamiento de la versión inicial.
+Durante la construcción del backend utilizamos Claude para apoyar la implementación con Java y Spring Boot.
 
-### Sesión 4. Desarrollo del frontend — 19 de noviembre
+La herramienta ayudó a estructurar los componentes, desarrollar funcionalidades, proponer validaciones y generar pruebas automatizadas.
 
-Para la interfaz de usuario utilizamos React, TypeScript y Vite.
+También permitió explorar mecanismos de comunicación mediante RabbitMQ y persistencia con PostgreSQL.
 
-Se desarrollaron las pantallas de restaurantes, menú, carrito de compras, seguimiento de pedidos, historial y panel de cocina.
+El equipo realizó una ejecución local de la versión inicial utilizando Docker Compose, lo que permitió comprobar el funcionamiento del sistema fuera del entorno de la IA.
 
-Claude realizó pruebas utilizando un backend simulado e identificó problemas relacionados con notificaciones duplicadas y visualización en dispositivos móviles.
+### Desarrollo del frontend
 
-Estas observaciones permitieron realizar correcciones antes de continuar con la integración.
+Para la interfaz web trabajamos con React, TypeScript y Vite.
 
-### Sesión 5. Integración con Docker — 19 de noviembre
+La IA apoyó la construcción de componentes y la identificación de problemas relacionados con la navegación, la presentación de información y las notificaciones.
 
-Se incorporó el frontend al entorno de Docker mediante una configuración multietapa con Node.js y Nginx.
+Se desarrollaron funcionalidades como la consulta de restaurantes, visualización de menús, carrito de compras, seguimiento de pedidos y panel de cocina.
 
-También se configuró Nginx como proxy inverso para comunicar la interfaz con los tres microservicios.
+Las pruebas realizadas con un backend simulado permitieron detectar problemas de visualización y comportamiento que fueron corregidos durante el desarrollo.
 
-Durante las verificaciones se detectó una directiva duplicada en la configuración de Nginx. El problema fue corregido y se volvió a comprobar la configuración.
+### Integración de tecnologías
 
-La ejecución completa de la versión final de Docker Compose debe confirmarse en el entorno local del equipo.
+Uno de los retos fue comprender cómo se relacionaban los diferentes servicios y cómo podían ejecutarse mediante Docker.
 
-### Sesión 6. Diagramas de arquitectura — 19 de noviembre
+Utilizamos la IA para orientar la configuración de contenedores, redes, variables de entorno y comunicación entre componentes.
 
-Utilizamos la herramienta para elaborar los diagramas C4 correspondientes al contexto, los contenedores y los componentes del sistema.
+También sirvió para analizar errores de configuración, especialmente en Nginx, y proponer soluciones que posteriormente pudieran verificarse.
 
-Los diagramas se generaron a partir de la arquitectura propuesta y se realizaron ajustes visuales para mejorar la claridad de las relaciones entre componentes.
+### Documentación y diagramas
 
-También se incluyeron los archivos fuente para facilitar futuras modificaciones.
+La herramienta apoyó la elaboración de diagramas UML y C4, así como la organización de requerimientos funcionales, reglas de negocio y decisiones arquitectónicas.
 
-### Sesión 7. Preparación de la documentación — 19 de noviembre
-
-Claude apoyó la organización de los requerimientos funcionales, la presentación del proyecto y el registro de las actividades realizadas con inteligencia artificial.
-
-Esta etapa permitió reunir la información técnica en documentos que facilitaran explicar la solución durante la entrega final.
-
-### Sesión 8. Revisión de los requerimientos de entrega — 19 de noviembre
-
-En la última etapa utilizamos la guía de entrega de la asignatura para revisar la documentación y los componentes desarrollados.
-
-Se realizaron ajustes en Docker Compose, los diagramas C4, los diagramas UML, los registros de decisiones arquitectónicas (ADR) y las reglas de negocio.
-
-También se documentó una propuesta de trabajo con GitFlow para organizar el control de versiones.
-
-Las pruebas automatizadas reportadas fueron 66 del backend y 6 del frontend. Sin embargo, la ejecución integral del Docker Compose actualizado quedó pendiente de confirmación local.
+Estos recursos facilitaron representar la estructura del sistema y relacionar las decisiones técnicas con los conceptos estudiados en la asignatura.
 
 ## 4. Participación del equipo
 
-El desarrollo de FoodExpress combinó decisiones tomadas por los integrantes con el apoyo de herramientas de inteligencia artificial.
+La participación del equipo comenzó con la elección del proyecto y la definición de las tecnologías y funcionalidades que se desarrollarían.
 
-Entre las principales actividades realizadas por el equipo estuvieron la selección del proyecto, la elección de tecnologías, la definición del alcance y la ejecución inicial del sistema mediante Docker Compose.
+También establecimos las prioridades de implementación y utilizamos los requerimientos académicos como referencia para orientar el trabajo.
 
-Claude tuvo una participación importante en la generación del código, las pruebas y la documentación. Por ello, una parte fundamental del trabajo académico consiste en revisar los resultados, comprender la arquitectura propuesta y comprobar que las funcionalidades correspondan a los requerimientos establecidos.
+Durante el proceso combinamos las decisiones del equipo con las propuestas y los componentes generados mediante inteligencia artificial.
 
-**Registro de aportes individuales por completar:**
+La ejecución local del sistema fue una actividad importante, ya que permitió comprobar aspectos que la herramienta no podía verificar completamente en su propio entorno.
 
-- **Sebastián Quintero:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
-- **Santiago Martínez:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
-- **Juan David Borda:** especificar las actividades de implementación, revisión, pruebas o documentación realizadas.
+Para completar el registro de participación individual, se deben incorporar las actividades específicas realizadas por cada integrante durante las revisiones, pruebas, correcciones y preparación de la entrega.
 
-## 5. Dificultades y limitaciones
+## 5. Dificultades y soluciones
 
-Durante el proceso encontramos varias situaciones que requirieron atención.
+Durante el desarrollo encontramos dificultades relacionadas con la integración de tecnologías, la configuración del entorno y la comunicación entre componentes.
 
-Una de las principales dificultades fue que el entorno de Claude no permitía ejecutar completamente algunos componentes del backend y de Docker. Esto hizo necesario diferenciar las pruebas automatizadas de las verificaciones realizadas sobre la aplicación completa.
+Una de las principales limitaciones fue que la IA no podía ejecutar completamente todos los servicios en su entorno. Por ello, fue necesario utilizar Docker Compose en un equipo local.
 
-También se identificaron errores en la configuración de Nginx, notificaciones duplicadas y problemas de visualización en pantallas pequeñas.
+También se identificaron problemas en la configuración de Nginx, notificaciones duplicadas y dificultades de visualización en dispositivos móviles.
 
-Otro aspecto importante fue que el proyecto se desarrolló inicialmente sin un repositorio de Git. Por esa razón, el historial de commits no representa todas las etapas de construcción y la estrategia GitFlow quedó planteada para el trabajo posterior.
+La herramienta permitió analizar estos problemas y generar correcciones, lo que facilitó continuar con el desarrollo.
 
-Estas situaciones evidenciaron la importancia de realizar pruebas en el entorno real y mantener un registro de los cambios desde el comienzo.
+Otra dificultad fue la incorporación tardía del control de versiones. A partir de esta experiencia se planteó una estrategia GitFlow para organizar las siguientes modificaciones del proyecto.
 
-## 6. Reflexión final
+## 6. Aprendizajes
 
-El desarrollo de FoodExpress nos permitió conocer mejor cómo se organiza una aplicación basada en microservicios y cómo se relacionan sus diferentes componentes.
+El desarrollo de FoodExpress nos permitió acercarnos a conceptos de arquitectura de software mediante un proyecto que integraba diferentes tecnologías.
 
-El uso de inteligencia artificial facilitó la generación de código y documentación, pero también nos mostró que una solución generada automáticamente necesita verificaciones. No basta con que el código esté escrito: es necesario comprobar que funcione, que las tecnologías se comuniquen correctamente y que se cumplan las reglas de negocio.
+Entre los temas trabajados estuvieron la separación de responsabilidades, los patrones de diseño, la comunicación mediante eventos y la organización de una aplicación en microservicios.
 
-Una de las principales lecciones del proyecto fue la importancia de organizar el trabajo desde el inicio, utilizar control de versiones y realizar pruebas de integración.
+También aprendimos que las respuestas de una herramienta de inteligencia artificial deben revisarse y contrastarse con el comportamiento real del sistema.
 
-Como mejora para futuros proyectos, consideramos importante incorporar Git desde la primera etapa, distribuir las responsabilidades de forma más clara y documentar las decisiones técnicas a medida que se toman.
+La experiencia mostró la importancia de complementar las herramientas de desarrollo con pruebas, documentación y comprensión de las decisiones técnicas.
 
-## 7. Conclusión
+## 7. Reflexión final
 
-La inteligencia artificial fue una herramienta importante durante el desarrollo de FoodExpress, especialmente en la implementación técnica y la preparación de los entregables.
+Consideramos que la inteligencia artificial fue un recurso útil durante el desarrollo de FoodExpress, ya que nos permitió consultar dudas, explorar soluciones y avanzar en la construcción del sistema.
 
-Su utilización permitió construir una solución con tres microservicios, una interfaz web y mecanismos de comunicación entre servicios.
+Su apoyo no se limitó a proporcionar información: también contribuyó a la generación de código, pruebas y documentación que formaron parte del proyecto.
 
-El proyecto también puso de manifiesto la necesidad de complementar el trabajo automatizado con decisiones humanas, revisión técnica y pruebas de funcionamiento.
+Al mismo tiempo, la experiencia nos permitió reconocer la importancia de definir correctamente los requerimientos, evaluar las alternativas propuestas y verificar los resultados obtenidos.
 
-La experiencia nos permitió identificar tanto las ventajas como las limitaciones de incorporar inteligencia artificial en el desarrollo de software.
+Como equipo, esta experiencia nos ayudó a comprender mejor el proceso de construcción de una aplicación basada en microservicios y la necesidad de utilizar las herramientas de inteligencia artificial con criterio técnico y responsabilidad.
+
+## 8. Conclusión
+
+FoodExpress fue una experiencia de aprendizaje en la que combinamos decisiones del equipo, tecnologías de desarrollo y herramientas de inteligencia artificial.
+
+Claude aportó orientación técnica y colaboró en la elaboración de diferentes componentes del sistema. El equipo definió el alcance, seleccionó las tecnologías y realizó verificaciones locales.
+
+La principal enseñanza fue comprender que la inteligencia artificial puede facilitar distintas actividades del desarrollo de software, pero sus resultados requieren revisión, pruebas y decisiones fundamentadas para construir una solución funcional.
